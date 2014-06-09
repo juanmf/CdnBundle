@@ -101,9 +101,7 @@ trait CdnFileDocumentTrait
      */
     public function getUploadRootDir(KernelInterface $kernel)
     {
-        return $kernel->locateResource(
-            '@DdCdnBundle/Resources/media/'
-        );
+        return $kernel->getContainer()->getParameter('dd_cdn.upload.dir');
     }
     
     /**

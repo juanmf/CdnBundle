@@ -69,7 +69,7 @@ class ApiController extends Controller
      * this action returns and caches, the dinamically generated png of that pdf's page. 
      * Useful for showing preview thumbs or pics.
      * 
-     * Media is located at <@>DdCdnBundle/Resources/media/<Document's pdfPath>
+     * Media is located at location designated by %dd_cdn.upload.dir%<Document's pdfPath>
      * If in a previous request a path list is made, with proper paths, its not mandatory 
      * to re-access Documents in DB. as assets are in filesystem. This fn should be 
      * faster than {@link self::getPreviewAction()}
@@ -114,7 +114,7 @@ class ApiController extends Controller
      * Returns the absolute path of the Document PDF. Given Document's pdfPath
      * attribute's value.
      * 
-     * Media is located at <@>DdCdnBundle/Resources/media/
+     * Media is located at a location designated by %dd_cdn.upload.dir%
      * 
      * @param string $relativePath The Document's pdfPath
      * 
@@ -126,9 +126,7 @@ class ApiController extends Controller
         if (empty($relativePath)) {
             return null;
         }
-        return $kernel->locateResource(
-            sprintf('@DdCdnBundle/Resources/media/%s', $relativePath)
-        );
+        return $kernel->getContainer()->getParameter('dd_cdn.upload.dir') . $relativePath;
     }
     
     /**
