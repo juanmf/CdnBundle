@@ -1,7 +1,9 @@
 Installation
 ============
 
-cli@host # php composer.phar require "docdigital/cdn-bundle: dev-master"
+```
+cli@host # php composer.phar require "docdigital/cdn-bundle:dev-master"
+```
 
 Configuration
 =============
