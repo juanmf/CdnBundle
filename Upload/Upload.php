@@ -69,15 +69,20 @@ class Upload
      * for the uploaded file, after which it dispatches a FilterEvent to allow for 
      * extension.
      * 
-     * @param Document $document
+     * @param Document $document  The Document.
+     * @param Document $request   Might be useful for event handlers. {@link UploadEvent::RELATIVE_PATH_READY}
+     * @param Document $extension If not available or you want to override the guessedExtension
+     * send the extenssion here, WITH DOT. e.g. ".pdf"
      * 
      * @return string The File relative path, possibli modified by the filter.
      */
-    public function createFileRelativePath(CdnFileDocumentInterface $document, Request $request = null)
-    {
+    public function createFileRelativePath(
+        CdnFileDocumentInterface $document, Request $request = null, $extension = null
+    ) {
         // TODO: figureout why $now->format('u') returns 000000
         $now = new \DateTime();
-        $filename = $now->format('Y-m-d-H-i-s-u') . '.' . $document->getFile()->guessExtension();
+        $ext = (null !== $extension) ? $extension : '.' . $document->getFile()->guessExtension();
+        $filename = $now->format('Y-m-d-H-i-s-u') . $ext;
         
         // Contract/2014-01/2014-01-16-18-56-14-200805029.pdf
         $fileRelativePath = sprintf(

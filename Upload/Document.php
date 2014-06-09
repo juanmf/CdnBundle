@@ -21,22 +21,4 @@ class Document implements CdnFileDocumentInterface
      * @var string
      */
     private $typeClassName = '';
-    
-    /**
-     * The relative pdf path to the pdf media associated with this Document
-     * 
-     * @var string 
-     */
-    private $pdfPath;
-    
-    /**
-     * The Client must tell us which class name to use, as here we don't have access
-     * to DocumentType metadata.
-     * 
-     * @param string $typeClassName
-     */
-    public function setTypeClassName($typeClassName)
-    {
-        $this->typeClassName = $typeClassName;
-    }
 }
