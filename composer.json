@@ -1,5 +1,5 @@
 {
-    "name": "docdigital/cnd-bundle",
+    "name": "docdigital/cdn-bundle",
     "description": "manages file uploads and downloads at Resources\\media\\%s",
     "keywords": ["upload", "assets", "pdf"],
     "type": "symfony-bundle",
