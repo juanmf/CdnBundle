@@ -1,6 +1,6 @@
 {
     "name": "docdigital/cnd-bundle",
-    "description": "manages file uploads and downloads ar Resources\media\%s",
+    "description": "manages file uploads and downloads at Resources\\media\\%s",
     "keywords": ["upload", "assets", "pdf"],
     "type": "symfony-bundle",
     "license": "MIT",
