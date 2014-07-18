@@ -76,7 +76,8 @@ class ApiController extends Controller
      * 
      * @Route("/document/getpreviewpath/{path}/{page}", name="document_previewpath_page")
      * @Method("GET")
-     * @param string $path    The documents's pdf relative path.
+     * @param string $docType The Class name of the Document
+     * @param string $id      The Id.
      * @param string $page    The PDF's page number
      * 
      * @return Response The 'image/png' or 404 if requested page or pdf doesn't exist.

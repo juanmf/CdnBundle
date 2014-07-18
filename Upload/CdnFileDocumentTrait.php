@@ -32,20 +32,6 @@ trait CdnFileDocumentTrait
     private $oldPath;
     
     /**
-     * Temporarily holds old file name when overriding preexisting.
-     * 
-     * @var string
-     */
-    private $pdfPath;
-    
-    /**
-     * Holds the Document's clas name, usefull for path generation.
-     * 
-     * @var string
-     */
-    private $typeClassName;
-    
-    /**
      * Get file.
      *
      * @return UploadedFile
@@ -71,16 +57,6 @@ trait CdnFileDocumentTrait
      * @return UploadedFile
      */
     public function getTypeClassName()
-    {
-        return $this->typeClassName;
-    }
-
-    /**
-     * Sets This Document Type's class name
-     * 
-     * @return type
-     */
-    public function setTypeClassName()
     {
         return $this->typeClassName;
     }
