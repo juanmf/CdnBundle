@@ -77,4 +77,12 @@ interface CdnFileDocumentInterface
      * Document instance.
      */
     public function getTypeClassName();
+    
+    /**
+     * Sets the short (no namespace) class name of the DocumentType related to this 
+     * Document instance.
+     * 
+     * @param string $typeClassName
+     */
+    public function setTypeClassName($typeClassName);
 }

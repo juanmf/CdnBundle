@@ -32,9 +32,9 @@ trait CdnFileDocumentTrait
     private $oldPath;
     
     /**
-     * Temporarily holds old file name when overriding preexisting.
-     * 
-     * @var string
+     * @var string The relative pdf path to the pdf media associated with this Document
+     *
+     * @ORM\Column(name="pdf_path", type="string", nullable=true)
      */
     private $pdfPath;
     
@@ -80,9 +80,9 @@ trait CdnFileDocumentTrait
      * 
      * @return type
      */
-    public function setTypeClassName()
+    public function setTypeClassName($typeClassName)
     {
-        return $this->typeClassName;
+        $this->typeClassName = $typeClassName;
     }
     
     /**

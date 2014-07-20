@@ -13,12 +13,4 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Document implements CdnFileDocumentInterface
 {
     use CdnFileDocumentTrait;
-    
-    /**
-     * The Client must tell us which class name to use, as here we don't have access
-     * to DocumentType metadata.
-     * @Assert\NotBlank(groups={"creation", "creationAjax"})
-     * @var string
-     */
-    private $typeClassName = '';
 }
