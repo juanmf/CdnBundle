@@ -176,17 +176,90 @@ class ApiController extends Controller
     /**
      * Download a Document's PDF.
      *
-     * @Route("/download/{relativePath}", name="document_download")
+     * @Route("/download/{relativePath}/{contentDisposition}", name="document_download",
+     *     defaults={"contentDisposition": "attachment"})
      * @Method("GET")
      */
-    public function documentDownloadAction($relativePath)
+    public function documentDownloadAction($relativePath, $contentDisposition)
     {
-        // TODO: cambiar, esto a relative path, pues en cdnBundle no hay entities
+        $this->checkContentDisposition($contentDisposition);
         $relativePath = strtr($relativePath, '~', '/');
         $pdfStream = file_get_contents(self::getAbsoluteMediaPath($this->get('kernel'), $relativePath));
         $response = new Response($pdfStream);
         $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Content-Disposition', 'attachment');
+        $response->headers->set('Content-Disposition', $contentDisposition);
         return $response;
+    }
+    
+    /**
+     * Download a Document's PDF.
+     *
+     * @Route("/downloadfractions/{relativePath}/{ranges}/{contentDisposition}", name="document_download_fractions",
+     *     defaults={"contentDisposition": "attachment", "ranges": "[]"})
+     * @Method("GET")
+     *
+     * 
+     * @param string $relativePath       The relative path to the PDF. with ~ instead 
+     * of / as Dir Separator
+     * @param string $ranges             The pages as a json encoded String. Suprted 
+     * values examples: <pre>
+     *    "[1, 4, 5]"  : pages 1; 4 and 5
+     *    "['1-5']"    : pages 1 to 5
+     *    "[1, '4-6']" : pages 1 and 4 to 6
+     * </pre>
+     * Optional.
+     * @param string $contentDisposition The value for content Disposition header 
+     * attribute optional, defaults to attachment. you could put 'inline'.
+     * 
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function documentDownloadFractionsAction($relativePath, $ranges, $contentDisposition)
+    {
+        $this->checkContentDisposition($contentDisposition);
+        
+        $relativePath = strtr($relativePath, '~', '/');
+        $pdf = self::getAbsoluteMediaPath($this->get('kernel'), $relativePath);
+        $pdfStream = $this->handlePageRanges($pdf, json_decode($ranges));
+        
+        $response = new Response($pdfStream);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', $contentDisposition);
+        return $response;
+    }
+    
+    /**
+     * Handle PDF page Ranges requested for download.
+     * 
+     * @param type $param
+     */
+    private function handlePageRanges($pdfPath, array $ranges)
+    {
+        /* @var $pdfManager \DocDigital\Bundle\PdfBundle\Pdf\Fpdi\FpdiPdfManager */
+        if (empty($ranges)) {
+            return file_get_contents($pdfPath);
+        }
+
+        $pdfManager = $this->get('dd_pdf.pdf_manager');
+        $supPdfs = array();
+        foreach ($ranges as $range) {
+            list($offset, $length) = explode('-', $range) + array(null, null);
+            $length = (null === $length) ? 1 : $length - $offset + 1;
+            $supPdfs[] = $pdfManager->getRange($pdfPath, $offset, $length);
+        }
+        return $pdfManager->merge($supPdfs)->render();
+    }
+    
+    /**
+     * Security issues might involve not checking allowed values here.
+     * 
+     * @param type $contentDisposition
+     */
+    private function checkContentDisposition($contentDisposition)
+    {
+        if (! in_array($contentDisposition, array('attachment', 'inline'))) {
+            throw new \InvalidArgumentException(
+                "Not Supported $contentDisposition. Supported $contentDisposition are ['attachment', 'inline']"
+            );
+        }
     }
 }
