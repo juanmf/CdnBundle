@@ -12,8 +12,10 @@ use Symfony\Component\Form\FormError;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+
 use DocDigital\Bundle\CdnBundle\Upload\Document;
 use DocDigital\Bundle\CdnBundle\Form\DocumentType;
+use DocDigital\Bundle\ToolsBundle\Util\Logger\Logger;
 
 /**
  * @Route("/api")
@@ -222,7 +224,7 @@ class ApiController extends Controller
         $pdfStream = $this->handlePageRanges($pdf, json_decode($ranges));
         
         $response = new Response($pdfStream);
-        $response->headers->set('Content-Type', 'application/pdf');
+        $this->configCachedResponse($response, 31536000, 'application/pdf');
         $response->headers->set('Content-Disposition', $contentDisposition);
         return $response;
     }
@@ -238,15 +240,21 @@ class ApiController extends Controller
         if (empty($ranges)) {
             return file_get_contents($pdfPath);
         }
-
+        $time = microtime(true);
         $pdfManager = $this->get('dd_pdf.pdf_manager');
         $supPdfs = array();
-        foreach ($ranges as $range) {
+        foreach ($ranges as $k => $range) {
             list($offset, $length) = explode('-', $range) + array(null, null);
             $length = (null === $length) ? 1 : $length - $offset + 1;
             $supPdfs[] = $pdfManager->getRange($pdfPath, $offset, $length);
         }
-        return $pdfManager->merge($supPdfs)->render();
+        $pdf = $pdfManager->merge($supPdfs)->render();
+        $time = microtime(true) - $time;
+        class_exists('DocDigital\Bundle\ToolsBundle\Util\Logger\Logger') && Logger::debug(
+            "handlePageRanges Took $time to merge $k ranges", $this->get('logger'),
+            Logger::APP_LOG_INFO
+        );
+        return $pdf;
     }
     
     /**

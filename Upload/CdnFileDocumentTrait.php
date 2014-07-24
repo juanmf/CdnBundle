@@ -3,7 +3,7 @@
 namespace DocDigital\Bundle\CdnBundle\Upload;
 
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Description of CdnFileDocumentStandardMethods
@@ -60,7 +60,7 @@ trait CdnFileDocumentTrait
      *
      * @param UploadedFile $file
      */
-    public function setFile(UploadedFile $file = null)
+    public function setFile(File $file = null)
     {
         $this->file = $file;
     }

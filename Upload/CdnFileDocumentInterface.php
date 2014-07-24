@@ -3,7 +3,7 @@
 namespace DocDigital\Bundle\CdnBundle\Upload;
 
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * This interface has the contract needed for {@link DocDigital\Bundle\CdnBundle\Upload\Upload}
@@ -25,7 +25,7 @@ interface CdnFileDocumentInterface
      *
      * @return UploadedFile
      */
-    public function setFile(UploadedFile $file = null);
+    public function setFile(File $file = null);
     
     /**
      * Gets the old relative path to delete after the update.
