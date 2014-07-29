@@ -7,21 +7,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Debug\Exception\ContextErrorException;
-use Symfony\Component\Form\FormError;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 use DocDigital\Bundle\CdnBundle\Upload\Document;
 use DocDigital\Bundle\CdnBundle\Form\DocumentType;
 use DocDigital\Bundle\ToolsBundle\Util\Logger\Logger;
+use DocDigital\Bundle\ToolsBundle\Controller\BasicControllerTasksTrait;
 
 /**
  * @Route("/api")
  */
 class ApiController extends Controller
 {
+    use BasicControllerTasksTrait;
     /**
      * TODO: Replace this with a random long string that holds in session 20 seconds
      * the necessary time to try to create the record in DocDigital server, fail, and 
@@ -30,7 +29,10 @@ class ApiController extends Controller
     CONST ALLOW_DELETE_TOKEN = '1';
   
     /**
-     * @Route("/cdn/save/{typeClassName}", name="api_save_document", defaults={"_format"="json"})
+     * @Route("/cdn/save/{typeClassName}", name="api_save_document", 
+     *      defaults={"_format"="json", "cdnDomain"="%dd_cdn.host%"},
+     *     host="{cdnDomain}",
+     *     requirements={"cdnDomain": "[^/]*"})
      * @Method({"POST"})
      */
     public function saveAction(Request $request, $typeClassName)
@@ -38,17 +40,21 @@ class ApiController extends Controller
         $form = $this->createForm(new DocumentType(), $document = new Document());
         $form->handleRequest($request);
         if (! $form->isValid()) {
-            return new JsonResponse (
+            return new JsonResponse(
                 array(
-                        'status' => 400, // Response::HTTP_BAD_REQUEST  since Sf2.4
-                        'path'   => null, 
-                        'error'  => $form->getErrorsAsString(),
+                    'status' => 400, // Response::HTTP_BAD_REQUEST  since Sf2.4
+                    'path'   => null, 
+                    'error'  => $form->getErrorsAsString() . print_r($request->request, true),
                 )
             );
         }
+        $document = $form->getData();
+        $document->setOldPath($document->getPdfPath());
+        $this->get('dd_cdn.pdf_changes_handler')
+            ->checkForPdfChanges($document, $request->request->get($form->getName()));
+
         $upload = $this->get('dd_cdn.upload');
         /* @var $upload \DocDigital\Bundle\CdnBundle\Upload\Upload */
-        $document = $form->getData();
         $document->setPdfPath($upload->createFileRelativePath($document, $request));
         $pdfPages = $this->get('dd_cdn.preview_maker')->getPdfPageCount(
                 $document->getFile()->getPathname()
@@ -76,7 +82,10 @@ class ApiController extends Controller
      * to re-access Documents in DB. as assets are in filesystem. This fn should be 
      * faster than {@link self::getPreviewAction()}
      * 
-     * @Route("/document/getpreviewpath/{path}/{page}", name="document_previewpath_page")
+     * @Route("/document/getpreviewpath/{path}/{page}", name="document_previewpath_page", 
+     *     defaults={"contentDisposition": "attachment", "ranges": "[]", "cdnDomain"="%dd_cdn.host%"},
+     *     host="{cdnDomain}",
+     *     requirements={"cdnDomain": "[^/]*"})
      * @Method("GET")
      * @param string $path    The documents's pdf relative path.
      * @param string $page    The PDF's page number
@@ -179,7 +188,9 @@ class ApiController extends Controller
      * Download a Document's PDF.
      *
      * @Route("/download/{relativePath}/{contentDisposition}", name="document_download",
-     *     defaults={"contentDisposition": "attachment"})
+     *     defaults={"contentDisposition": "attachment","cdnDomain"="%dd_cdn.host%"},
+     *     host="{cdnDomain}",
+     *     requirements={"cdnDomain": "[^/]*"})
      * @Method("GET")
      */
     public function documentDownloadAction($relativePath, $contentDisposition)
@@ -197,7 +208,9 @@ class ApiController extends Controller
      * Download a Document's PDF.
      *
      * @Route("/downloadfractions/{relativePath}/{ranges}/{contentDisposition}", name="document_download_fractions",
-     *     defaults={"contentDisposition": "attachment", "ranges": "[]"})
+     *     defaults={"contentDisposition": "attachment", "ranges": "[]", "cdnDomain"="%dd_cdn.host%"},
+     *     host="{cdnDomain}",
+     *     requirements={"cdnDomain": "[^/]*"})
      * @Method("GET")
      *
      * 

@@ -22,7 +22,9 @@ class DocumentType extends AbstractType
     {
         $builder
             ->add('file', 'file')
-            ->add('typeClassName');
+            ->add('typeClassName')
+            ->add('pdfPath', 'hidden', array('required' => false))
+            ->add('insertOptions', 'docdigital_pdfinsert', array('mapped' => false, 'required' => false));
     }
     
     /**

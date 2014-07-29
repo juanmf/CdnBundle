@@ -7,14 +7,21 @@
     
     <parameters>
         <parameter key="dd_cdn.preview_maker.class">DocDigital\Bundle\CdnBundle\ImageProcessor\PreviewMaker</parameter>
+        <parameter key="dd_cdn.pdf_changes_handler.class">DocDigital\Bundle\CdnBundle\Pdf\PdfHandler</parameter>
         <parameter key="dd_cdn.upload.class">DocDigital\Bundle\CdnBundle\Upload\Upload</parameter>
-
     </parameters>
 
     <services>
         <service id="dd_cdn.preview_maker" class="%dd_cdn.preview_maker.class%" />
+        
         <service id="dd_cdn.upload" class="%dd_cdn.upload.class%" >
             <argument type="service" id="event_dispatcher" />
+        </service>
+        
+        <service id="dd_cdn.pdf_changes_handler" class="%dd_cdn.pdf_changes_handler.class%" >
+            <argument type="service" id="kernel" />
+            <argument type="service" id="dd_pdf.pdf_manager" />
+            <argument type="service" id="logger" />
         </service>
     </services>
     

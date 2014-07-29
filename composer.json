@@ -11,6 +11,7 @@
         }
     ],
     "require": {
+        "docdigital/pdf-manager-bundle": "~1.0"
     },
     "autoload": {
         "psr-0": { "DocDigital\\Bundle\\CdnBundle": "" }
