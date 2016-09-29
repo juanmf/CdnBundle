@@ -59,12 +59,14 @@ class ApiController extends Controller
         $pdfPages = $this->get('dd_cdn.preview_maker')->getPdfPageCount(
                 $document->getFile()->getPathname()
             );
+        $document->setPdfSha1(sha1_file($document->getFile()->getPathname()));
         $upload->upload($this->get('kernel'), $document);
                 
         return new JsonResponse (
             array(
                 'status'   => 200, // Response::HTTP_BAD_REQUEST  since Sf2.4
                 'path'     => $document->getPdfPath(), 
+                'pdfSha1'  => $document->getPdfSha1(), 
                 'pdfPages' => $pdfPages, 
                 'error'    => null,
                 'token'    => self::ALLOW_DELETE_TOKEN,

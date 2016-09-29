@@ -39,6 +39,13 @@ trait CdnFileDocumentTrait
     private $pdfPath;
     
     /**
+     * @var string The relative pdf path to the pdf media associated with this Document
+     *
+     * @ORM\Column(name="pdf_sha1", type="string", nullable=true)
+     */
+    private $pdfSha1;
+    
+    /**
      * Holds the Document's clas name, usefull for path generation.
      * 
      * @var string
@@ -147,5 +154,25 @@ trait CdnFileDocumentTrait
     public function setPdfPath($pdfPath)
     {
         $this->pdfPath = $pdfPath;
+    }
+    
+    /**
+     * Returns the pdf sha1 hash
+     * 
+     * @return string
+     */
+    public function getPdfSha1()
+    {
+        return $this->pdfSha1;
+    }
+
+    /**
+     * Sets the pdf sha1 hash
+     * 
+     * @param string $pdfSha1
+     */
+    public function setPdfSha1($pdfSha1)
+    {
+        $this->pdfSha1 = $pdfSha1;
     }
 }
